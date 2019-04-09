@@ -36,7 +36,7 @@ public abstract class AndroidInjectionModule {
   abstract Map<String, AndroidInjector.Factory<?>> stringKeyedInjectorFactories();
 
   @Multibinds
-  abstract Map<Class<View>, AndroidInjector.Factory<View>> viewInjectorFactories():
+  abstract Map<Class<View>, AndroidInjector.Factory<View>> viewInjectorFactories();
 
   private AndroidInjectionModule() {}
 }
