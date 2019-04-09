@@ -38,13 +38,15 @@ public abstract class DaggerApplication extends Application
         HasFragmentInjector,
         HasServiceInjector,
         HasBroadcastReceiverInjector,
-        HasContentProviderInjector {
+        HasContentProviderInjector,
+        HasViewInjector {
 
   @Inject DispatchingAndroidInjector<Activity> activityInjector;
   @Inject DispatchingAndroidInjector<BroadcastReceiver> broadcastReceiverInjector;
   @Inject DispatchingAndroidInjector<Fragment> fragmentInjector;
   @Inject DispatchingAndroidInjector<Service> serviceInjector;
   @Inject DispatchingAndroidInjector<ContentProvider> contentProviderInjector;
+  @Inject DispatchingAndroidInjector<View> viewInjector;
   private volatile boolean needToInject = true;
 
   @Override
@@ -91,23 +93,51 @@ public abstract class DaggerApplication extends Application
     needToInject = false;
   }
 
+  public DispatchingAndroidInjector<Activity> dispatchingActivityInjector() {
+    return activityInjector;
+  }
+
+  public DispatchingAndroidInjector<Fragment> dispatchingFragmentInjector() {
+    return fragmentInjector;
+  }
+
+  public DispatchingAndroidInjector<BroadcastReceiver> dispatchingBroadcastReceiverInjector() {
+    return broadcastReceiverInjector;
+  }
+
+  public DispatchingAndroidInjector<Service> dispatchingServiceInjector() {
+    return serviceInjector;
+  }
+
+  // injectIfNecessary is called here but not on the other *Injector() methods because it is the
+  // only one that should be called (in AndroidInjection.inject(ContentProvider)) before
+  // Application.onCreate()
+  public DispatchingAndroidInjector<ContentProvider> dispatchingContentProviderInjector() {
+    injectIfNecessary();
+    return contentProviderInjector;
+  }
+
+  public DispatchingAndroidInjector<View> dispatchingViewInjector() {
+    return viewInjector;
+  }
+
   @Override
-  public DispatchingAndroidInjector<Activity> activityInjector() {
+  public AndroidInjector<Activity> activityInjector() {
     return activityInjector;
   }
 
   @Override
-  public DispatchingAndroidInjector<Fragment> fragmentInjector() {
+  public AndroidInjector<Fragment> fragmentInjector() {
     return fragmentInjector;
   }
 
   @Override
-  public DispatchingAndroidInjector<BroadcastReceiver> broadcastReceiverInjector() {
+  public AndroidInjector<BroadcastReceiver> broadcastReceiverInjector() {
     return broadcastReceiverInjector;
   }
 
   @Override
-  public DispatchingAndroidInjector<Service> serviceInjector() {
+  public AndroidInjector<Service> serviceInjector() {
     return serviceInjector;
   }
 
@@ -118,5 +148,10 @@ public abstract class DaggerApplication extends Application
   public AndroidInjector<ContentProvider> contentProviderInjector() {
     injectIfNecessary();
     return contentProviderInjector;
+  }
+
+  @Override
+  public AndroidInjector<View> viewInjector() {
+    return viewInjector;
   }
 }
