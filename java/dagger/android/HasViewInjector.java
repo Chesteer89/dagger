@@ -17,11 +17,12 @@
 package dagger.android;
 
 import android.app.Activity;
+import android.view.View;
 import dagger.internal.Beta;
 
 /** Provides an {@link AndroidInjector} of {@link View}s. */
 @Beta
-public interface HasActivityInjector {
+public interface HasViewInjector {
 
   /** Returns an {@link AndroidInjector} of {@link View}s. */
   AndroidInjector<View> viewInjector();

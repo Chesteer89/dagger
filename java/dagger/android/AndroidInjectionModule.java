@@ -16,6 +16,7 @@
 
 package dagger.android;
 
+import android.view.View;
 import dagger.Module;
 import dagger.internal.Beta;
 import dagger.multibindings.Multibinds;

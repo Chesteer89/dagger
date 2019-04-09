@@ -26,8 +26,11 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ContentProvider;
 import android.content.Context;
+import android.content.ContextWrapper;
+import android.view.View;
 import android.util.Log;
 import dagger.internal.Beta;
+import dagger.android.HasViewInjector;
 
 /** Injects core Android types. */
 @Beta
@@ -208,7 +211,7 @@ public final class AndroidInjection {
   public static void inject(View view) {
     checkNotNull(view, "view");
     Activity activity = getViewActivity(view);
-    if (!(application instanceof HasViewInjector)) {
+    if (!(activity instanceof HasViewInjector)) {
       throw new RuntimeException(
               String.format(
                       "%s does not implement %s",
@@ -225,14 +228,14 @@ public final class AndroidInjection {
 
   public static Activity getViewActivity(View view) {
       // https://android.googlesource.com/platform/frameworks/support/+/03e0f3daf3c97ee95cd78b2f07bc9c1be05d43db/v7/mediarouter/src/android/support/v7/app/MediaRouteButton.java#276
-      Context context = getContext();
+      Context context = view.getContext();
       while (context instanceof ContextWrapper) {
         if (context instanceof Activity) {
           return (Activity)context;
         }
         context = ((ContextWrapper) context).getBaseContext();
       }
-      throw new IllegalStateException("Context does not stem from an activity: " + getContext());
+      throw new IllegalStateException("Context does not stem from an activity: " + view.getContext());
   }
 
   private AndroidInjection() {}

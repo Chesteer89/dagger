@@ -22,6 +22,7 @@ import android.app.Fragment;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ContentProvider;
+import android.view.View;
 import com.google.errorprone.annotations.ForOverride;
 import dagger.internal.Beta;
 import javax.inject.Inject;
