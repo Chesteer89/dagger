@@ -20,9 +20,13 @@ import static android.util.Log.DEBUG;
 import static dagger.internal.Preconditions.checkNotNull;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.ContextWrapper;
+import android.view.View;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import dagger.android.AndroidInjector;
+import dagger.android.HasViewInjector;
 import dagger.internal.Beta;
 
 /** Injects core Android types from support libraries. */
@@ -90,6 +94,43 @@ public final class AndroidSupportInjection {
     }
     throw new IllegalArgumentException(
         String.format("No injector was found for %s", fragment.getClass().getCanonicalName()));
+  }
+
+  /**
+   * Injects {@code view} if an associated {@link AndroidInjector} implementation can be found,
+   * otherwise throws an {@link IllegalArgumentException}.
+   *
+   * @throws RuntimeException if the {@link View} doesn't implement {@link
+   *     HasActivityInjector}.
+   */
+  public static void inject(View view) {
+    checkNotNull(view, "view");
+    Activity activity = getViewActivity(view);
+    if (!(activity instanceof HasViewInjector)) {
+      throw new RuntimeException(
+              String.format(
+                      "%s does not implement %s",
+                      activity.getClass().getCanonicalName(),
+                      HasViewInjector.class.getCanonicalName()));
+    }
+
+    AndroidInjector<View> viewInjector =
+            ((HasViewInjector) activity).viewInjector();
+    checkNotNull(viewInjector, "%s.viewInjector() returned null", activity.getClass());
+
+    viewInjector.inject(view);
+  }
+
+  public static Activity getViewActivity(View view) {
+    // https://android.googlesource.com/platform/frameworks/support/+/03e0f3daf3c97ee95cd78b2f07bc9c1be05d43db/v7/mediarouter/src/android/support/v7/app/MediaRouteButton.java#276
+    Context context = view.getContext();
+    while (context instanceof ContextWrapper) {
+      if (context instanceof Activity) {
+        return (Activity)context;
+      }
+      context = ((ContextWrapper) context).getBaseContext();
+    }
+    throw new IllegalStateException("Context does not stem from an activity: " + view.getContext());
   }
 
   private AndroidSupportInjection() {}
